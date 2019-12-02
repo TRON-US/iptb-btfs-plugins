@@ -11,6 +11,7 @@ import (
 	docker "github.com/ipfs/iptb-plugins/docker"
 	local "github.com/ipfs/iptb-plugins/local"
 	localp2pd "github.com/ipfs/iptb-plugins/localp2pd"
+	localbtfs "github.com/ipfs/iptb-plugins/localbtfs"
 )
 
 func init() {
@@ -33,6 +34,19 @@ func init() {
 		GetAttrList: localp2pd.GetAttrList,
 		GetAttrDesc: localp2pd.GetAttrDesc,
 		PluginName:  localp2pd.PluginName,
+		BuiltIn:     true,
+	}, false)
+
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = testbed.RegisterPlugin(testbed.IptbPlugin{
+		From:        "<builtin>",
+		NewNode:     localbtfs.NewNode,
+		GetAttrList: localbtfs.GetAttrList,
+		GetAttrDesc: localbtfs.GetAttrDesc,
+		PluginName:  localbtfs.PluginName,
 		BuiltIn:     true,
 	}, false)
 

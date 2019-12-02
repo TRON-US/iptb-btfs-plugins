@@ -1,6 +1,7 @@
 module github.com/ipfs/iptb-plugins
 
 require (
+	github.com/TRON-US/go-btfs-config v0.2.0
 	github.com/ipfs/go-cid v0.0.3
 	github.com/ipfs/go-ipfs-config v0.0.11
 	github.com/ipfs/iptb v1.4.0
