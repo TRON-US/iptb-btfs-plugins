@@ -1,4 +1,4 @@
-package ipfs
+package btfs
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/ipfs/go-cid"
-	config "github.com/ipfs/go-ipfs-config"
+	config "github.com/TRON-US/go-btfs-config"
 	"github.com/multiformats/go-multiaddr"
 	"github.com/pkg/errors"
 
@@ -73,15 +73,47 @@ func GetPeerID(l testbedi.Config) (*cid.Cid, error) {
 
 	lcfg, ok := icfg.(*config.Config)
 	if !ok {
-		return nil, fmt.Errorf("Error: GetConfig() is not an ipfs config")
+		return nil, fmt.Errorf("Error: GetConfig() is not an btfs config")
 	}
+	fmt.Println("in util.go GetPeerID(), lcfg is: ", lcfg)
+	fmt.Println("============================")
+	fmt.Printf("%+v\n",lcfg)
 
 	pcid, err := cid.Decode(lcfg.Identity.PeerID)
+
+	fmt.Println("in util.go GetPeerID(), pcid is: ", pcid)
+	fmt.Println("in util.go GetPeerID(), err is: ", err)
+
 	if err != nil {
 		return nil, err
 	}
 
 	return &pcid, nil
+}
+
+
+
+func GetPeerID_btfs(l testbedi.Config) (string, error) {
+	icfg, err := l.Config()
+	if err != nil {
+		return "Error", err
+	}
+
+	lcfg, ok := icfg.(*config.Config)
+	if !ok {
+		return "Error", fmt.Errorf("Error: GetConfig() is not an btfs config")
+	}
+	fmt.Println("in util.go GetPeerID_btfgs(), lcfg is: ", lcfg)
+	fmt.Println("============================")
+	fmt.Printf("%+v\n",lcfg)
+
+	//pcid, err := cid.Decode(lcfg.Identity.PeerID)
+	pcid := lcfg.Identity.PeerID
+
+	fmt.Println("in util.go GetPeerID_btfs(), pcid is: ", pcid)
+
+
+	return pcid, nil
 }
 
 func GetMetricList() []string {
@@ -108,7 +140,7 @@ func GetAttrDesc(attr string) (string, error) {
 	case attrID:
 		return "node ID", nil
 	case attrPath:
-		return "node IPFS_PATH", nil
+		return "node BTFS_PATH", nil
 	default:
 		return "", errors.New("unrecognized attribute")
 	}
@@ -195,7 +227,7 @@ func SwarmAddrs(l testbedi.Core) ([]string, error) {
 		return nil, err
 	}
 
-	output, err := l.RunCmd(context.TODO(), nil, "ipfs", "swarm", "addrs", "local")
+	output, err := l.RunCmd(context.TODO(), nil, "btfs", "swarm", "addrs", "local")
 	if err != nil {
 		return nil, err
 	}
@@ -210,7 +242,7 @@ func SwarmAddrs(l testbedi.Core) ([]string, error) {
 	var maddrs []string
 	for _, straddr := range straddrs {
 		if !strings.Contains(straddr, pcid) {
-			fstraddr := fmt.Sprintf("%s/ipfs/%s", straddr, pcid)
+			fstraddr := fmt.Sprintf("%s/btfs/%s", straddr, pcid)
 			maddrs = append(maddrs, fstraddr)
 		} else {
 			maddrs = append(maddrs, straddr)

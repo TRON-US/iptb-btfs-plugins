@@ -7,25 +7,25 @@ the IPTB build in this project.
 ### Example
 
 ```
-$ iptb auto -type localipfs -count 5
+$ iptb auto -type localbtfs -count 5
 <output removed>
 
 $ iptb start
 
 $ iptb shell 0
-$ echo $IPFS_PATH
+$ echo $BTFS_PATH
 /home/iptb/testbed/testbeds/default/0
 
-$ echo 'hey!' | ipfs add -q
-QmNqugRcYjwh9pEQUK7MLuxvLjxDNZL1DH8PJJgWtQXxuF
+$ echo 'pizza!' | btfs add -q
+QmZio6HUGdQfPq1tMNGUyDvcGnBERwyBdic75bXXU5txcj
 
 $ exit
 
 $ iptb connect 0 4
 
 $ iptb shell 4
-$ ipfs cat QmNqugRcYjwh9pEQUK7MLuxvLjxDNZL1DH8PJJgWtQXxuF
-hey!
+$ btfs cat QmZio6HUGdQfPq1tMNGUyDvcGnBERwyBdic75bXXU5txcj
+pizza!
 ```
 
 ### Usage
@@ -68,9 +68,19 @@ GLOBAL OPTIONS:
 ### Install
 
 ```
-$ go get -d github.com/ipfs/iptb-plugins
-$ cd $GOPATH/src/github.com/ipfs/iptb-plugins
-$ make install
+$ go get -d github.com/TRON-US/iptb-btfs-plugins
+$ cd $GOPATH/src/github.com/TRON-US/iptb-btfs-plugins
+$ cd iptb
+$ go install
+```
+
+
+### Configure for local networking
+
+```
+$ iptb run -- btfs config --json Addresses.Announce  []
+$ iptb stop
+$ iptb start
 ```
 
 ### License

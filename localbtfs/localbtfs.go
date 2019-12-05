@@ -1,4 +1,4 @@
-package pluginlocalipfs
+package pluginlocalbtfs
 
 import (
 	"context"
@@ -13,20 +13,20 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ipfs/iptb-plugins"
+	"github.com/TRON-US/iptb-btfs-plugins"
 	"github.com/ipfs/iptb/testbed/interfaces"
 	"github.com/ipfs/iptb/util"
 
 	"github.com/ipfs/go-cid"
-	config "github.com/ipfs/go-ipfs-config"
-	serial "github.com/ipfs/go-ipfs-config/serialize"
+	config "github.com/TRON-US/go-btfs-config"
+	serial "github.com/TRON-US/go-btfs-config/serialize"
 	"github.com/multiformats/go-multiaddr"
 	"github.com/pkg/errors"
 )
 
 var errTimeout = errors.New("timeout")
 
-var PluginName = "localipfs"
+var PluginName = "localbtfs"
 
 type LocalIpfs struct {
 	dir       string
@@ -46,13 +46,13 @@ type LocalIpfs struct {
 // - mdns: if present, enables mdns (off by default)
 func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 	mdns := false
-	binary := ""
+	binary := "btfs"
 
 	var ok bool
 
 	if binary, ok = attrs["binary"]; !ok {
 		var err error
-		binary, err = exec.LookPath("ipfs")
+		binary, err = exec.LookPath("btfs")
 		if err != nil {
 			return nil, err
 		}
@@ -101,19 +101,19 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 }
 
 func GetAttrList() []string {
-	return ipfs.GetAttrList()
+	return btfs.GetAttrList()
 }
 
 func GetAttrDesc(attr string) (string, error) {
-	return ipfs.GetAttrDesc(attr)
+	return btfs.GetAttrDesc(attr)
 }
 
 func GetMetricList() []string {
-	return ipfs.GetMetricList()
+	return btfs.GetMetricList()
 }
 
 func GetMetricDesc(attr string) (string, error) {
-	return ipfs.GetMetricDesc(attr)
+	return btfs.GetMetricDesc(attr)
 }
 
 /// TestbedNode Interface
@@ -121,11 +121,20 @@ func GetMetricDesc(attr string) (string, error) {
 func (l *LocalIpfs) Init(ctx context.Context, agrs ...string) (testbedi.Output, error) {
 	agrs = append([]string{l.binary, "init"}, agrs...)
 	output, oerr := l.RunCmd(ctx, nil, agrs...)
+
+	fmt.Println("in Init args is ", agrs)
+	fmt.Println("in Init output is: ", output)
+	fmt.Println("in Init oerr is: ", oerr)
+
 	if oerr != nil {
 		return nil, oerr
 	}
 
 	icfg, err := l.Config()
+
+	fmt.Println("in Init icfg is: ", icfg)
+	fmt.Println("in Init err is: ", err)
+
 	if err != nil {
 		return nil, err
 	}
@@ -158,6 +167,9 @@ func (l *LocalIpfs) Start(ctx context.Context, wait bool, args ...string) (testb
 
 	dir := l.dir
 	dargs := append([]string{"daemon"}, args...)
+
+	fmt.Println("in Start, dargs is: ", dargs)
+
 	cmd := exec.Command(l.binary, dargs...)
 	cmd.Dir = dir
 
@@ -194,7 +206,7 @@ func (l *LocalIpfs) Start(ctx context.Context, wait bool, args ...string) (testb
 	}
 
 	if wait {
-		return nil, ipfs.WaitOnAPI(l)
+		return nil, btfs.WaitOnAPI(l)
 	}
 
 	return nil, nil
@@ -254,6 +266,8 @@ func (l *LocalIpfs) RunCmd(ctx context.Context, stdin io.Reader, args ...string)
 	cmd.Env = env
 	cmd.Stdin = stdin
 
+	fmt.Println("in RunCmd: ", cmd)
+
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
 		return nil, err
@@ -265,16 +279,22 @@ func (l *LocalIpfs) RunCmd(ctx context.Context, stdin io.Reader, args ...string)
 	}
 
 	err = cmd.Start()
+	fmt.Println("in RunCmd past the cmd.Start() err is: ", err)
+
 	if err != nil {
 		return nil, err
 	}
 
 	stderrbytes, err := ioutil.ReadAll(stderr)
+	fmt.Println("in RunCmd past the ioutil.ReadAll() err is: ", err)
+
 	if err != nil {
 		return nil, err
 	}
 
 	stdoutbytes, err := ioutil.ReadAll(stdout)
+	fmt.Println("in RunCmd past the ioutil.ReadAll() err is: ", err)
+
 	if err != nil {
 		return nil, err
 	}
@@ -284,6 +304,7 @@ func (l *LocalIpfs) RunCmd(ctx context.Context, stdin io.Reader, args ...string)
 	}
 
 	exiterr := cmd.Wait()
+	fmt.Println("in RunCmd past the cmd.Wait() err is: ", exiterr)
 
 	var exitcode = 0
 	switch oerr := exiterr.(type) {
@@ -306,7 +327,7 @@ func (l *LocalIpfs) Connect(ctx context.Context, tbn testbedi.Core) error {
 		return err
 	}
 
-	output, err := l.RunCmd(ctx, nil, "ipfs", "swarm", "connect", swarmaddrs[0])
+	output, err := l.RunCmd(ctx, nil, "btfs", "swarm", "connect", swarmaddrs[0])
 
 	if err != nil {
 		return err
@@ -330,12 +351,14 @@ func (l *LocalIpfs) Shell(ctx context.Context, nodes []testbedi.Core) error {
 		return fmt.Errorf("no shell found")
 	}
 
-	if len(os.Getenv("IPFS_PATH")) != 0 {
-		// If the users shell sets IPFS_PATH, it will just be overridden by the shell again
-		return fmt.Errorf("shell has IPFS_PATH set, please unset before trying to use iptb shell")
+	if len(os.Getenv("BTFS_PATH")) != 0 {
+		// If the users shell sets BTFS_PATH, it will just be overridden by the shell again
+		return fmt.Errorf("shell has BTFS_PATH set, please unset before trying to use iptb shell")
 	}
 
 	nenvs, err := l.env()
+	fmt.Println("in Shell past the l.env) nenvs is: ", nenvs)
+
 	if err != nil {
 		return err
 	}
@@ -346,12 +369,16 @@ func (l *LocalIpfs) Shell(ctx context.Context, nodes []testbedi.Core) error {
 
 	for i, n := range nodes {
 		peerid, err := n.PeerID()
+		fmt.Println("in Shell in for range nodes loop, peerid: ", peerid)
+
 
 		if err != nil {
 			return err
 		}
 
 		nenvs = append(nenvs, fmt.Sprintf("NODE%d=%s", i, peerid))
+		fmt.Println("in Shell in for range nodes loop, after append, nenvs: ", nenvs)
+
 	}
 
 	return syscall.Exec(shell, []string{shell}, nenvs)
@@ -366,11 +393,11 @@ func (l *LocalIpfs) String() string {
 }
 
 func (l *LocalIpfs) APIAddr() (string, error) {
-	return ipfs.GetAPIAddrFromRepo(l.dir)
+	return btfs.GetAPIAddrFromRepo(l.dir)
 }
 
 func (l *LocalIpfs) SwarmAddrs() ([]string, error) {
-	return ipfs.SwarmAddrs(l)
+	return btfs.SwarmAddrs(l)
 }
 
 func (l *LocalIpfs) Dir() string {
@@ -383,13 +410,15 @@ func (l *LocalIpfs) PeerID() (string, error) {
 	}
 
 	var err error
-	l.peerid, err = ipfs.GetPeerID(l)
+	//l.peerid, err = btfs.GetPeerID(l)
+
+	peerid_btfs, err := btfs.GetPeerID_btfs(l)
 
 	if err != nil {
 		return "", err
 	}
 
-	return l.peerid.String(), nil
+	return peerid_btfs, nil
 }
 
 /// Metric Interface
@@ -403,7 +432,7 @@ func (l *LocalIpfs) GetMetricDesc(attr string) (string, error) {
 }
 
 func (l *LocalIpfs) Metric(metric string) (string, error) {
-	return ipfs.GetMetric(l, metric)
+	return btfs.GetMetric(l, metric)
 }
 
 func (l *LocalIpfs) Heartbeat() (map[string]string, error) {
@@ -411,7 +440,7 @@ func (l *LocalIpfs) Heartbeat() (map[string]string, error) {
 }
 
 func (l *LocalIpfs) Events() (io.ReadCloser, error) {
-	return ipfs.ReadLogs(l)
+	return btfs.ReadLogs(l)
 }
 
 func (l *LocalIpfs) Logs() (io.ReadCloser, error) {
@@ -429,7 +458,7 @@ func (l *LocalIpfs) GetAttrDesc(attr string) (string, error) {
 }
 
 func (l *LocalIpfs) Attr(attr string) (string, error) {
-	return ipfs.GetAttr(l, attr)
+	return btfs.GetAttr(l, attr)
 }
 
 func (l *LocalIpfs) SetAttr(string, string) error {
@@ -453,7 +482,7 @@ func (l *LocalIpfs) WriteConfig(cfg interface{}) error {
 }
 
 func (l *LocalIpfs) Type() string {
-	return "ipfs"
+	return "btfs"
 }
 
 func (l *LocalIpfs) Deployment() string {
@@ -510,13 +539,13 @@ func (l *LocalIpfs) isAlive() (bool, error) {
 
 func (l *LocalIpfs) env() ([]string, error) {
 	envs := os.Environ()
-	ipfspath := "IPFS_PATH=" + l.dir
+	btfspath := "BTFS_PATH=" + l.dir
 
 	for i, e := range envs {
-		if strings.HasPrefix(e, "IPFS_PATH=") {
-			envs[i] = ipfspath
+		if strings.HasPrefix(e, "BTFS_PATH=") {
+			envs[i] = btfspath
 			return envs, nil
 		}
 	}
-	return append(envs, ipfspath), nil
+	return append(envs, btfspath), nil
 }
