@@ -1,4 +1,4 @@
-package ipfs
+package btfs
 
 import (
 	"context"

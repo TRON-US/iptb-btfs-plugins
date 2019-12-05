@@ -24,7 +24,7 @@ $ exit
 $ iptb connect 0 4
 
 $ iptb shell 4
-$ btfs cat QmNqugRcYjwh9pEQUK7MLuxvLjxDNZL1DH8PJJgWtQXxuF
+$ btfs cat QmZio6HUGdQfPq1tMNGUyDvcGnBERwyBdic75bXXU5txcj
 pizza!
 ```
 
@@ -68,8 +68,8 @@ GLOBAL OPTIONS:
 ### Install
 
 ```
-$ go get -d github.com/TRON-US/iptb-plugins-1
-$ cd $GOPATH/src/github.com/TRON-US/iptb-plugins-1
+$ go get -d github.com/TRON-US/iptb-btfs-plugins
+$ cd $GOPATH/src/github.com/TRON-US/iptb-btfs-plugins
 $ cd iptb
 $ go install
 ```
@@ -79,6 +79,8 @@ $ go install
 
 ```
 $ iptb run -- btfs config --json Addresses.Announce  []
+$ iptb stop
+$ iptb start
 ```
 
 ### License

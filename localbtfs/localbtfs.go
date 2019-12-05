@@ -13,7 +13,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ipfs/iptb-plugins"
+	"github.com/TRON-US/iptb-btfs-plugins"
 	"github.com/ipfs/iptb/testbed/interfaces"
 	"github.com/ipfs/iptb/util"
 
@@ -101,19 +101,19 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 }
 
 func GetAttrList() []string {
-	return ipfs.GetAttrList()
+	return btfs.GetAttrList()
 }
 
 func GetAttrDesc(attr string) (string, error) {
-	return ipfs.GetAttrDesc(attr)
+	return btfs.GetAttrDesc(attr)
 }
 
 func GetMetricList() []string {
-	return ipfs.GetMetricList()
+	return btfs.GetMetricList()
 }
 
 func GetMetricDesc(attr string) (string, error) {
-	return ipfs.GetMetricDesc(attr)
+	return btfs.GetMetricDesc(attr)
 }
 
 /// TestbedNode Interface
@@ -206,7 +206,7 @@ func (l *LocalIpfs) Start(ctx context.Context, wait bool, args ...string) (testb
 	}
 
 	if wait {
-		return nil, ipfs.WaitOnAPI(l)
+		return nil, btfs.WaitOnAPI(l)
 	}
 
 	return nil, nil
@@ -393,11 +393,11 @@ func (l *LocalIpfs) String() string {
 }
 
 func (l *LocalIpfs) APIAddr() (string, error) {
-	return ipfs.GetAPIAddrFromRepo(l.dir)
+	return btfs.GetAPIAddrFromRepo(l.dir)
 }
 
 func (l *LocalIpfs) SwarmAddrs() ([]string, error) {
-	return ipfs.SwarmAddrs(l)
+	return btfs.SwarmAddrs(l)
 }
 
 func (l *LocalIpfs) Dir() string {
@@ -410,9 +410,9 @@ func (l *LocalIpfs) PeerID() (string, error) {
 	}
 
 	var err error
-	//l.peerid, err = ipfs.GetPeerID(l)
+	//l.peerid, err = btfs.GetPeerID(l)
 
-	peerid_btfs, err := ipfs.GetPeerID_btfs(l)
+	peerid_btfs, err := btfs.GetPeerID_btfs(l)
 
 	if err != nil {
 		return "", err
@@ -432,7 +432,7 @@ func (l *LocalIpfs) GetMetricDesc(attr string) (string, error) {
 }
 
 func (l *LocalIpfs) Metric(metric string) (string, error) {
-	return ipfs.GetMetric(l, metric)
+	return btfs.GetMetric(l, metric)
 }
 
 func (l *LocalIpfs) Heartbeat() (map[string]string, error) {
@@ -440,7 +440,7 @@ func (l *LocalIpfs) Heartbeat() (map[string]string, error) {
 }
 
 func (l *LocalIpfs) Events() (io.ReadCloser, error) {
-	return ipfs.ReadLogs(l)
+	return btfs.ReadLogs(l)
 }
 
 func (l *LocalIpfs) Logs() (io.ReadCloser, error) {
@@ -458,7 +458,7 @@ func (l *LocalIpfs) GetAttrDesc(attr string) (string, error) {
 }
 
 func (l *LocalIpfs) Attr(attr string) (string, error) {
-	return ipfs.GetAttr(l, attr)
+	return btfs.GetAttr(l, attr)
 }
 
 func (l *LocalIpfs) SetAttr(string, string) error {

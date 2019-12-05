@@ -1,7 +1,7 @@
 package main
 
 import (
-	plugin "github.com/ipfs/iptb-plugins/localbtfs"
+	plugin "github.com/TRON-US/iptb-btfs-plugins/localbtfs"
 	testbedi "github.com/ipfs/iptb/testbed/interfaces"
 )
 
