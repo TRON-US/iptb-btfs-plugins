@@ -1,46 +1,42 @@
 IPTB_ROOT ?=$(HOME)/testbed
+NODES ?=5
 
 all: iptb
 
 deps:
-	gx install
+	go mod download
 
 iptb: deps
-	gx-go rw
 	(cd iptb; go build)
-	gx-go uw
 CLEAN += iptb/iptb
 
-ipfslocal: deps
-	gx-go rw
-	(cd local/plugin; go build -buildmode=plugin -o ../../build/localipfs.so)
-	gx-go uw
-CLEAN += build/localipfs.so
-
-p2pdlocal: deps
-	gx-go rw
-	(cd localp2pd/plugin; go build -buildmode=plugin -o ../../build/localp2pd.so)
-	gx-go uw
-CLEAN += build/localp2pd.so
-
-ipfsdocker: deps
-	gx-go rw
-	(cd docker/plugin; go build -buildmode=plugin -o ../../build/dockeripfs.so)
-	gx-go uw
-CLEAN += build/dockeripfs.so
-
-ipfsbrowser:
-	gx-go rw
-	(cd browser/plugin; go build -buildmode=plugin -o ../../build/browseripfs.so)
-	gx-go uw
-CLEAN += build/browseripfs.so
+btfslocal: deps
+	(cd localbtfs/plugin; go build -buildmode=plugin -o ../../build/localbtfs.so)
+CLEAN += build/localbtfs.so
 
 install: deps
-	gx-go rw
 	(cd iptb; go install)
-	gx-go uw
 
 clean:
 	rm ${CLEAN}
 
-.PHONY: all clean ipfslocal p2pdlocal ipfsdocker ipfsbrowser
+start:
+	iptb auto -type localbtfs -count $(NODES)
+	iptb run -- btfs config --json Addresses.Announce  []
+	iptb start
+
+start_dev:
+	iptb auto -type localbtfs -count $(NODES)
+	iptb run -- btfs config --json Addresses.Announce  []
+	iptb run -- btfs config Services.StatusServerDomain 'https://status-dev.btfs.io'
+	iptb run -- btfs config Services.EscrowDomain 'https://escrow-dev.btfs.io'
+	iptb run -- btfs config Services.GuardDomain 'https://guard-dev.btfs.io'
+	iptb run -- btfs config Services.HubDomain 'https://hub-dev.btfs.io'
+	iptb run -- btfs config optin
+	iptb start
+
+stop:
+	iptb stop
+
+
+.PHONY: all clean ipfslocal p2pdlocal ipfsdocker ipfsbrowser start start_dev stop

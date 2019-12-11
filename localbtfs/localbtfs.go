@@ -122,18 +122,11 @@ func (l *LocalIpfs) Init(ctx context.Context, agrs ...string) (testbedi.Output, 
 	agrs = append([]string{l.binary, "init"}, agrs...)
 	output, oerr := l.RunCmd(ctx, nil, agrs...)
 
-	fmt.Println("in Init args is ", agrs)
-	fmt.Println("in Init output is: ", output)
-	fmt.Println("in Init oerr is: ", oerr)
-
 	if oerr != nil {
 		return nil, oerr
 	}
 
 	icfg, err := l.Config()
-
-	fmt.Println("in Init icfg is: ", icfg)
-	fmt.Println("in Init err is: ", err)
 
 	if err != nil {
 		return nil, err
@@ -168,7 +161,6 @@ func (l *LocalIpfs) Start(ctx context.Context, wait bool, args ...string) (testb
 	dir := l.dir
 	dargs := append([]string{"daemon"}, args...)
 
-	fmt.Println("in Start, dargs is: ", dargs)
 
 	cmd := exec.Command(l.binary, dargs...)
 	cmd.Dir = dir
@@ -279,21 +271,18 @@ func (l *LocalIpfs) RunCmd(ctx context.Context, stdin io.Reader, args ...string)
 	}
 
 	err = cmd.Start()
-	fmt.Println("in RunCmd past the cmd.Start() err is: ", err)
 
 	if err != nil {
 		return nil, err
 	}
 
 	stderrbytes, err := ioutil.ReadAll(stderr)
-	fmt.Println("in RunCmd past the ioutil.ReadAll() err is: ", err)
 
 	if err != nil {
 		return nil, err
 	}
 
 	stdoutbytes, err := ioutil.ReadAll(stdout)
-	fmt.Println("in RunCmd past the ioutil.ReadAll() err is: ", err)
 
 	if err != nil {
 		return nil, err
@@ -304,7 +293,6 @@ func (l *LocalIpfs) RunCmd(ctx context.Context, stdin io.Reader, args ...string)
 	}
 
 	exiterr := cmd.Wait()
-	fmt.Println("in RunCmd past the cmd.Wait() err is: ", exiterr)
 
 	var exitcode = 0
 	switch oerr := exiterr.(type) {
@@ -357,7 +345,6 @@ func (l *LocalIpfs) Shell(ctx context.Context, nodes []testbedi.Core) error {
 	}
 
 	nenvs, err := l.env()
-	fmt.Println("in Shell past the l.env) nenvs is: ", nenvs)
 
 	if err != nil {
 		return err
@@ -369,7 +356,6 @@ func (l *LocalIpfs) Shell(ctx context.Context, nodes []testbedi.Core) error {
 
 	for i, n := range nodes {
 		peerid, err := n.PeerID()
-		fmt.Println("in Shell in for range nodes loop, peerid: ", peerid)
 
 
 		if err != nil {
@@ -377,7 +363,6 @@ func (l *LocalIpfs) Shell(ctx context.Context, nodes []testbedi.Core) error {
 		}
 
 		nenvs = append(nenvs, fmt.Sprintf("NODE%d=%s", i, peerid))
-		fmt.Println("in Shell in for range nodes loop, after append, nenvs: ", nenvs)
 
 	}
 

@@ -68,15 +68,24 @@ GLOBAL OPTIONS:
 ### Install
 
 ```
-$ go get -d github.com/TRON-US/iptb-btfs-plugins
-$ cd $GOPATH/src/github.com/TRON-US/iptb-btfs-plugins
-$ cd iptb
-$ go install
+$ git clone git@github.com:TRON-US/iptb-btfs-plugins.git
+$ cd iptb-btfs-plugins
+$ make install 
 ```
 
+### Run iptb with btfs nodes
+```
+$ export NODES=<number of btfs nodes desired, default is 5>
+$ make start
+```
+
+### Run iptb with btfs nodes reporting to dev services
+```
+$ export NODES=<number of btfs nodes desired, default is 5>
+$ make start_dev
+```
 
 ### Configure for local networking
-
 ```
 $ iptb run -- btfs config --json Addresses.Announce  []
 $ iptb stop

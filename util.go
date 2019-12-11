@@ -75,14 +75,8 @@ func GetPeerID(l testbedi.Config) (*cid.Cid, error) {
 	if !ok {
 		return nil, fmt.Errorf("Error: GetConfig() is not an btfs config")
 	}
-	fmt.Println("in util.go GetPeerID(), lcfg is: ", lcfg)
-	fmt.Println("============================")
-	fmt.Printf("%+v\n",lcfg)
 
 	pcid, err := cid.Decode(lcfg.Identity.PeerID)
-
-	fmt.Println("in util.go GetPeerID(), pcid is: ", pcid)
-	fmt.Println("in util.go GetPeerID(), err is: ", err)
 
 	if err != nil {
 		return nil, err
@@ -103,15 +97,9 @@ func GetPeerID_btfs(l testbedi.Config) (string, error) {
 	if !ok {
 		return "Error", fmt.Errorf("Error: GetConfig() is not an btfs config")
 	}
-	fmt.Println("in util.go GetPeerID_btfgs(), lcfg is: ", lcfg)
-	fmt.Println("============================")
-	fmt.Printf("%+v\n",lcfg)
 
 	//pcid, err := cid.Decode(lcfg.Identity.PeerID)
 	pcid := lcfg.Identity.PeerID
-
-	fmt.Println("in util.go GetPeerID_btfs(), pcid is: ", pcid)
-
 
 	return pcid, nil
 }
