@@ -32,6 +32,7 @@ start_dev:
 	iptb run -- btfs config Services.EscrowDomain 'https://escrow-dev.btfs.io'
 	iptb run -- btfs config Services.GuardDomain 'https://guard-dev.btfs.io'
 	iptb run -- btfs config Services.HubDomain 'https://hub-dev.btfs.io'
+	iptb run -- btfs config optin
 	iptb start
 
 stop:

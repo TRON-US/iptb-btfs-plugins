@@ -69,6 +69,7 @@ GLOBAL OPTIONS:
 
 ```
 $ git clone git@github.com:TRON-US/iptb-btfs-plugins.git
+$ cd iptb-btfs-plugins
 $ make install 
 ```
 
