@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ipfs/go-cid"
 	config "github.com/TRON-US/go-btfs-config"
+	"github.com/ipfs/go-cid"
 	"github.com/multiformats/go-multiaddr"
 	"github.com/pkg/errors"
 
@@ -84,8 +84,6 @@ func GetPeerID(l testbedi.Config) (*cid.Cid, error) {
 
 	return &pcid, nil
 }
-
-
 
 func GetPeerID_btfs(l testbedi.Config) (string, error) {
 	icfg, err := l.Config()

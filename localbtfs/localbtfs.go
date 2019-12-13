@@ -17,9 +17,9 @@ import (
 	"github.com/ipfs/iptb/testbed/interfaces"
 	"github.com/ipfs/iptb/util"
 
-	"github.com/ipfs/go-cid"
 	config "github.com/TRON-US/go-btfs-config"
 	serial "github.com/TRON-US/go-btfs-config/serialize"
+	"github.com/ipfs/go-cid"
 	"github.com/multiformats/go-multiaddr"
 	"github.com/pkg/errors"
 )
@@ -29,12 +29,13 @@ var errTimeout = errors.New("timeout")
 var PluginName = "localbtfs"
 
 type LocalIpfs struct {
-	dir       string
-	peerid    *cid.Cid
-	apiaddr   multiaddr.Multiaddr
-	swarmaddr multiaddr.Multiaddr
-	binary    string
-	mdns      bool
+	dir           string
+	peerid        *cid.Cid
+	apiaddr       multiaddr.Multiaddr
+	remoteapiaddr multiaddr.Multiaddr
+	swarmaddr     multiaddr.Multiaddr
+	binary        string
+	mdns          bool
 }
 
 // NewNode creates a localipfs iptb core node that runs ipfs on the local
@@ -42,6 +43,7 @@ type LocalIpfs struct {
 // Attributes
 // - binary: binary to use for Init, Start (defaults to ipfs in path)
 // - apiaddr: multiaddr use for the api (defaults to /ip4/127.0.0.1/tcp/0)
+// - remoteapiaddr: multiaddr use for the remote api RPC over lib2p2 (defaults to /ip4/127.0.0.1/tcp/0)
 // - swarmaddr: multiaddr used for swarm (defaults to /ip4/127.0.0.1/tcp/0)
 // - mdns: if present, enables mdns (off by default)
 func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
@@ -63,6 +65,11 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 		return nil, err
 	}
 
+	remoteapiaddr, err := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/0")
+	if err != nil {
+		return nil, err
+	}
+
 	swarmaddr, err := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/0")
 	if err != nil {
 		return nil, err
@@ -71,6 +78,15 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 	if apiaddrstr, ok := attrs["apiaddr"]; ok {
 		var err error
 		apiaddr, err = multiaddr.NewMultiaddr(apiaddrstr)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if remoteapiaddrstr, ok := attrs["remoteapiaddr"]; ok {
+		var err error
+		remoteapiaddr, err = multiaddr.NewMultiaddr(remoteapiaddrstr)
 
 		if err != nil {
 			return nil, err
@@ -91,11 +107,12 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 	}
 
 	return &LocalIpfs{
-		dir:       dir,
-		apiaddr:   apiaddr,
-		swarmaddr: swarmaddr,
-		binary:    binary,
-		mdns:      mdns,
+		dir:           dir,
+		apiaddr:       apiaddr,
+		remoteapiaddr: remoteapiaddr,
+		swarmaddr:     swarmaddr,
+		binary:        binary,
+		mdns:          mdns,
 	}, nil
 
 }
@@ -137,6 +154,7 @@ func (l *LocalIpfs) Init(ctx context.Context, agrs ...string) (testbedi.Output, 
 	lcfg.Bootstrap = []string{}
 	lcfg.Addresses.Swarm = []string{l.swarmaddr.String()}
 	lcfg.Addresses.API = []string{l.apiaddr.String()}
+	lcfg.Addresses.RemoteAPI = []string{l.remoteapiaddr.String()}
 	lcfg.Addresses.Gateway = []string{""}
 	lcfg.Discovery.MDNS.Enabled = l.mdns
 
@@ -160,7 +178,6 @@ func (l *LocalIpfs) Start(ctx context.Context, wait bool, args ...string) (testb
 
 	dir := l.dir
 	dargs := append([]string{"daemon"}, args...)
-
 
 	cmd := exec.Command(l.binary, dargs...)
 	cmd.Dir = dir
@@ -356,7 +373,6 @@ func (l *LocalIpfs) Shell(ctx context.Context, nodes []testbedi.Core) error {
 
 	for i, n := range nodes {
 		peerid, err := n.PeerID()
-
 
 		if err != nil {
 			return err
