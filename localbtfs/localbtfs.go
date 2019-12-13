@@ -92,6 +92,7 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 			return nil, err
 		}
 	}
+
 	if swarmaddrstr, ok := attrs["swarmaddr"]; ok {
 		var err error
 		swarmaddr, err = multiaddr.NewMultiaddr(swarmaddrstr)
