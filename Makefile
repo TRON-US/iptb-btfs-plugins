@@ -1,5 +1,8 @@
 IPTB_ROOT ?=$(HOME)/testbed
 NODES ?=5
+# set env vars ESCROW_PUB_KEYS and the GUARD_PUB_KEYS and the 'make start' will config for all nodes
+GUARDPUBKEYS := $(GUARD_PUB_KEYS)
+ESCROWPUBKEYS := $(ESCROW_PUB_KEYS)
 
 all: iptb
 
@@ -23,6 +26,12 @@ clean:
 start:
 	iptb auto -type localbtfs -count $(NODES)
 	iptb run -- btfs config --json Addresses.Announce  []
+ifdef GUARDPUBKEYS
+	iptb run -- btfs config --json Services.GuardPubKeys ['"$(GUARDPUBKEYS)"']
+endif
+ifdef ESCROWPUBKEYS
+	iptb run -- btfs config --json Services.EscrowPubKeys ['"$(ESCROWPUBKEYS)"']
+endif
 	iptb start
 
 start_dev:
@@ -32,6 +41,12 @@ start_dev:
 	iptb run -- btfs config Services.EscrowDomain 'https://escrow-dev.btfs.io'
 	iptb run -- btfs config Services.GuardDomain 'https://guard-dev.btfs.io'
 	iptb run -- btfs config Services.HubDomain 'https://hub-dev.btfs.io'
+ifdef GUARDPUBKEYS
+	iptb run -- btfs config --json Services.GuardPubKeys ['"$(GUARDPUBKEYS)"']
+endif
+ifdef ESCROWPUBKEYS
+	iptb run -- btfs config --json Services.EscrowPubKeys ['"$(ESCROWPUBKEYS)"']
+endif
 	iptb run -- btfs config optin
 	iptb start
 
