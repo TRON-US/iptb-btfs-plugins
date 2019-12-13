@@ -32,6 +32,7 @@ type LocalIpfs struct {
 	dir       string
 	peerid    *cid.Cid
 	apiaddr   multiaddr.Multiaddr
+	remoteapiaddr   multiaddr.Multiaddr
 	swarmaddr multiaddr.Multiaddr
 	binary    string
 	mdns      bool
@@ -42,6 +43,7 @@ type LocalIpfs struct {
 // Attributes
 // - binary: binary to use for Init, Start (defaults to ipfs in path)
 // - apiaddr: multiaddr use for the api (defaults to /ip4/127.0.0.1/tcp/0)
+// - remoteapiaddr: multiaddr use for the remote api RPC over lib2p2 (defaults to /ip4/127.0.0.1/tcp/0)
 // - swarmaddr: multiaddr used for swarm (defaults to /ip4/127.0.0.1/tcp/0)
 // - mdns: if present, enables mdns (off by default)
 func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
@@ -63,6 +65,11 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 		return nil, err
 	}
 
+        remoteapiaddr, err := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/0")
+        if err != nil {
+                return nil, err
+        }
+
 	swarmaddr, err := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/0")
 	if err != nil {
 		return nil, err
@@ -77,6 +84,14 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 		}
 	}
 
+        if remoteapiaddrstr, ok := attrs["remoteapiaddr"]; ok {
+                var err error
+                remoteapiaddr, err = multiaddr.NewMultiaddr(remoteapiaddrstr)
+
+                if err != nil {
+                        return nil, err
+                }
+        }
 	if swarmaddrstr, ok := attrs["swarmaddr"]; ok {
 		var err error
 		swarmaddr, err = multiaddr.NewMultiaddr(swarmaddrstr)
@@ -93,6 +108,7 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 	return &LocalIpfs{
 		dir:       dir,
 		apiaddr:   apiaddr,
+		remoteapiaddr:   remoteapiaddr,
 		swarmaddr: swarmaddr,
 		binary:    binary,
 		mdns:      mdns,
@@ -137,6 +153,7 @@ func (l *LocalIpfs) Init(ctx context.Context, agrs ...string) (testbedi.Output, 
 	lcfg.Bootstrap = []string{}
 	lcfg.Addresses.Swarm = []string{l.swarmaddr.String()}
 	lcfg.Addresses.API = []string{l.apiaddr.String()}
+	lcfg.Addresses.RemoteAPI = []string{l.remoteapiaddr.String()}
 	lcfg.Addresses.Gateway = []string{""}
 	lcfg.Discovery.MDNS.Enabled = l.mdns
 
