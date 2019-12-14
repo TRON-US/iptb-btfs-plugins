@@ -33,7 +33,6 @@ ifdef ESCROWPUBKEYS
 	iptb run -- btfs config --json Services.EscrowPubKeys ['"$(ESCROWPUBKEYS)"']
 endif
 	iptb run -- btfs config --json Experimental.StorageHostEnabled true
-	iptb run -- btfs config --json Experimental.P2pHttpProxy true
 	iptb run -- btfs config --json Experimental.StorageClientEnabled true
 	iptb start
 
@@ -51,7 +50,6 @@ ifdef ESCROWPUBKEYS
 	iptb run -- btfs config --json Services.EscrowPubKeys ['"$(ESCROWPUBKEYS)"']
 endif
 	iptb run -- btfs config --json Experimental.StorageHostEnabled true
-	iptb run -- btfs config --json Experimental.P2pHttpProxy true
 	iptb run -- btfs config --json Experimental.StorageClientEnabled true
 	iptb run -- btfs config optin
 	iptb start
