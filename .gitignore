@@ -1,4 +1,5 @@
 build
 iptb/iptb
-idea
-iptb_logs.txt
+.idea
+*.log
+*.txt
