@@ -35,6 +35,9 @@ endif
 	iptb run -- btfs config --json Experimental.StorageHostEnabled true
 	iptb run -- btfs config --json Experimental.StorageClientEnabled true
 	iptb start
+	sleep 10
+	iptb logs > iptb_logs.txt
+	go run rewrite_config.go
 
 start_dev:
 	iptb auto -type localbtfs -count $(NODES)
@@ -53,6 +56,9 @@ endif
 	iptb run -- btfs config --json Experimental.StorageClientEnabled true
 	iptb run -- btfs config optin
 	iptb start
+	sleep 10
+	iptb logs > iptb_logs.txt
+	go run rewrite_config.go
 
 stop:
 	iptb stop
