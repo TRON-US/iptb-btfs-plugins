@@ -37,7 +37,7 @@ endif
 	iptb start
 	sleep 10
 	iptb logs > iptb_logs.txt
-	go run rewrite_config.go
+	go run standalone/rewrite_config.go
 
 start_dev:
 	iptb auto -type localbtfs -count $(NODES)
@@ -58,7 +58,7 @@ endif
 	iptb start
 	sleep 10
 	iptb logs > iptb_logs.txt
-	go run rewrite_config.go
+	go run standalone/rewrite_config.go
 
 stop:
 	iptb stop
