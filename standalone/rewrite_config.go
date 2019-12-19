@@ -10,6 +10,7 @@ import (
 
 type ports struct {
 	node_id    int
+	swarm      string
 	api        string
 	remote_api string
 }
@@ -32,12 +33,19 @@ func main() {
 
 	//separate the lines in each node log
 	for i := 0; i < (len(node_logs) - 1); i++ {
+		var swarm_port string
 		var api_port string
 		var remote_api_port string
 
 		//separate the lines on newline character
 		lines := strings.Split(node_logs[i], "\n")
 		for j := 0; j < (len(lines)); j++ {
+			if strings.HasPrefix(lines[j], "Swarm listening on /ip4/") {
+				//split to find port value
+				parts := strings.Split(lines[j], "/")
+				swarm_port = parts[(len(parts))-1]
+				fmt.Println("swarm port is: ", swarm_port, " for node: ", i)
+			}
 			if strings.HasPrefix(lines[j], "API server listening") {
 				//split to find port value
 				parts := strings.Split(lines[j], "/")
@@ -54,6 +62,7 @@ func main() {
 
 		my_node := new(ports)
 		my_node.node_id = i
+		my_node.swarm = swarm_port
 		my_node.api = api_port
 		my_node.remote_api = remote_api_port
 		nodePorts = append(nodePorts, my_node)
@@ -68,8 +77,10 @@ func main() {
 		home_path := os.Getenv("HOME")
 		path := home_path + "/testbed/testbeds/default/" + local_node_id + "/config"
 
-		new_api_string := `    "API": "/ip4/127.0.0.1/tcp/` + nodePorts[i].api + `",`
-		new_remote_api_string := `    "RemoteAPI": "/ip4/127.0.0.1/tcp/` + nodePorts[i].remote_api + `",`
+		//allow connections from external nodes
+		new_api_string := `    "API": "/ip4/0.0.0.0/tcp/` + nodePorts[i].api + `",`
+		new_remote_api_string := `    "RemoteAPI": "/ip4/0.0.0.0/tcp/` + nodePorts[i].remote_api + `",`
+		new_swarm_string := `      "/ip4/0.0.0.0/tcp/` + nodePorts[i].swarm + `"`
 
 		read, err := ioutil.ReadFile(path)
 		if err != nil {
@@ -80,8 +91,10 @@ func main() {
 		newContents := strings.Replace(string(read), `    "API": "/ip4/127.0.0.1/tcp/0",`, new_api_string, -1)
 		//second pass
 		newContents2 := strings.Replace(newContents, `    "RemoteAPI": "/ip4/127.0.0.1/tcp/0",`, new_remote_api_string, -1)
+		//third pass to set the swarm port do this last since there should only be one match 127.0.0.1/tcp/0 left
+		newContents3 := strings.Replace(newContents2, `      "/ip4/127.0.0.1/tcp/0"`, new_swarm_string, -1)
 
-		err = ioutil.WriteFile(path, []byte(newContents2), 0)
+		err = ioutil.WriteFile(path, []byte(newContents3), 0)
 		if err != nil {
 			panic(err)
 		}

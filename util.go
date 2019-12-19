@@ -153,7 +153,7 @@ func ReadLogs(l testbedi.Libp2p) (io.ReadCloser, error) {
 		return nil, err
 	}
 
-	resp, err := http.Get(fmt.Sprintf("http://%s:%s/api/v0/log/tail", ip, pt))
+	resp, err := http.Get(fmt.Sprintf("http://%s:%s/api/v1/log/tail", ip, pt))
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +187,7 @@ func GetBW(l testbedi.Libp2p) (*BW, error) {
 		return nil, err
 	}
 
-	resp, err := http.Get(fmt.Sprintf("http://%s:%s/api/v0/stats/bw", ip, pt))
+	resp, err := http.Get(fmt.Sprintf("http://%s:%s/api/v1/stats/bw", ip, pt))
 	if err != nil {
 		return nil, err
 	}
@@ -276,7 +276,7 @@ func tryAPICheck(l testbedi.Libp2p) error {
 		return err
 	}
 
-	resp, err := http.Get(fmt.Sprintf("http://%s:%s/api/v0/id", ip, pt))
+	resp, err := http.Get(fmt.Sprintf("http://%s:%s/api/v1/id", ip, pt))
 	if err != nil {
 		return err
 	}
