@@ -43,20 +43,32 @@ func main() {
 			if strings.HasPrefix(lines[j], "Swarm listening on /ip4/") {
 				//split to find port value
 				parts := strings.Split(lines[j], "/")
-				swarm_port = parts[(len(parts))-1]
-				fmt.Println("swarm port is: ", swarm_port, " for node: ", i)
+				if len(parts) > 0 {
+					swarm_port = parts[(len(parts))-1]
+					fmt.Println("swarm port is: ", swarm_port, " for node: ", i)
+				} else {
+					fmt.Println("Unable to parse Swarm port")
+				}
 			}
 			if strings.HasPrefix(lines[j], "API server listening") {
 				//split to find port value
 				parts := strings.Split(lines[j], "/")
-				api_port = parts[(len(parts))-1]
-				fmt.Println("api server port is: ", api_port, " for node: ", i)
+				if len(parts) > 0 {
+					api_port = parts[(len(parts))-1]
+					fmt.Println("api server port is: ", api_port, " for node: ", i)
+				} else {
+					fmt.Println("Unable to parse API port")
+				}
 			}
 			if strings.HasPrefix(lines[j], "Remote API server listening") {
 				//split to find port value
 				parts := strings.Split(lines[j], "/")
-				remote_api_port = parts[(len(parts))-1]
-				fmt.Println("remote api server port is: ", remote_api_port, " for node: ", i)
+				if len(parts) > 0 {
+					remote_api_port = parts[(len(parts))-1]
+					fmt.Println("remote api server port is: ", remote_api_port, " for node: ", i)
+				} else {
+					fmt.Println("Unable to parse Remote API port")
+				}
 			}
 		}
 
