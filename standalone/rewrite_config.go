@@ -94,6 +94,7 @@ func main() {
 		new_api_string := `    "API": "/ip4/0.0.0.0/tcp/` + nodePorts[i].api + `",`
 		new_remote_api_string := `    "RemoteAPI": "/ip4/0.0.0.0/tcp/` + nodePorts[i].remote_api + `",`
 		new_swarm_string := `      "/ip4/0.0.0.0/tcp/` + nodePorts[i].swarm + `"`
+		new_announce_string := `tcp/` + nodePorts[i].swarm
 
 		read, err := ioutil.ReadFile(path)
 		if err != nil {
@@ -106,8 +107,10 @@ func main() {
 		newContents2 := strings.Replace(newContents, `    "RemoteAPI": "/ip4/127.0.0.1/tcp/0",`, new_remote_api_string, -1)
 		//third pass to set the swarm port do this last since there should only be one match 127.0.0.1/tcp/0 left
 		newContents3 := strings.Replace(newContents2, `      "/ip4/127.0.0.1/tcp/0"`, new_swarm_string, -1)
+		//fourth pass to set the address announce port
+		newContents4 := strings.Replace(newContents3, `tcp/4001`, new_announce_string, -1)
 
-		err = ioutil.WriteFile(path, []byte(newContents3), 0)
+		err = ioutil.WriteFile(path, []byte(newContents4), 0)
 		if err != nil {
 			panic(err)
 		}
