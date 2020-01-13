@@ -25,7 +25,6 @@ clean:
 
 start:
 	iptb auto -type localbtfs -count $(NODES)
-#	iptb run -- btfs config --json Addresses.Announce  []
 ifdef GUARDPUBKEYS
 	iptb run -- btfs config --json Services.GuardPubKeys ['"$(GUARDPUBKEYS)"']
 endif
@@ -41,7 +40,6 @@ endif
 
 start_dev:
 	iptb auto -type localbtfs -count $(NODES)
-#	iptb run -- btfs config --json Addresses.Announce  []
 	iptb run -- btfs config Services.StatusServerDomain 'https://status-dev.btfs.io'
 	iptb run -- btfs config Services.EscrowDomain 'https://escrow-dev.btfs.io'
 	iptb run -- btfs config Services.GuardDomain 'https://guard-dev.btfs.io'
