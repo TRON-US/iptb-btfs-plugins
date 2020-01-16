@@ -1,8 +1,5 @@
 IPTB_ROOT ?=$(HOME)/testbed
 NODES ?=5
-# set env vars ESCROW_PUB_KEYS and the GUARD_PUB_KEYS and the 'make start' will config for all nodes
-GUARDPUBKEYS := $(GUARD_PUB_KEYS)
-ESCROWPUBKEYS := $(ESCROW_PUB_KEYS)
 
 all: iptb
 
@@ -25,14 +22,7 @@ clean:
 
 start:
 	iptb auto -type localbtfs -count $(NODES)
-ifdef GUARDPUBKEYS
-	iptb run -- btfs config --json Services.GuardPubKeys ['"$(GUARDPUBKEYS)"']
-endif
-ifdef ESCROWPUBKEYS
-	iptb run -- btfs config --json Services.EscrowPubKeys ['"$(ESCROWPUBKEYS)"']
-endif
-	iptb run -- btfs config --json Experimental.StorageHostEnabled true
-	iptb run -- btfs config --json Experimental.StorageClientEnabled true
+	iptb run -- btfs config profile apply storage-host
 	iptb start
 	sleep 10
 	iptb logs > iptb_logs.txt
@@ -40,18 +30,7 @@ endif
 
 start_dev:
 	iptb auto -type localbtfs -count $(NODES)
-	iptb run -- btfs config Services.StatusServerDomain 'https://status-dev.btfs.io'
-	iptb run -- btfs config Services.EscrowDomain 'https://escrow-dev.btfs.io'
-	iptb run -- btfs config Services.GuardDomain 'https://guard-dev.btfs.io'
-	iptb run -- btfs config Services.HubDomain 'https://hub-dev.btfs.io'
-ifdef GUARDPUBKEYS
-	iptb run -- btfs config --json Services.GuardPubKeys ['"$(GUARDPUBKEYS)"']
-endif
-ifdef ESCROWPUBKEYS
-	iptb run -- btfs config --json Services.EscrowPubKeys ['"$(ESCROWPUBKEYS)"']
-endif
-	iptb run -- btfs config --json Experimental.StorageHostEnabled true
-	iptb run -- btfs config --json Experimental.StorageClientEnabled true
+	iptb run -- btfs config profile apply storage-host-dev
 	iptb run -- btfs config optin
 	iptb start
 	sleep 10
