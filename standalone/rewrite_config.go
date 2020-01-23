@@ -91,8 +91,8 @@ func main() {
 		path := home_path + "/testbed/testbeds/default/" + local_node_id + "/config"
 
 		//allow connections from external nodes
-		new_api_string := `    "API": "/ip4/0.0.0.0/tcp/` + nodePorts[i].api + `",`
-		new_remote_api_string := `    "RemoteAPI": "/ip4/0.0.0.0/tcp/` + nodePorts[i].remote_api + `",`
+		new_api_string := `    "API": "/ip4/127.0.0.1/tcp/` + nodePorts[i].api + `",`
+		new_remote_api_string := `    "RemoteAPI": "/ip4/127.0.0.1/tcp/` + nodePorts[i].remote_api + `",`
 		new_swarm_string := `      "/ip4/0.0.0.0/tcp/` + nodePorts[i].swarm + `"`
 		new_announce_string := `tcp/` + nodePorts[i].swarm
 
