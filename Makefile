@@ -3,18 +3,15 @@ NODES ?=5
 
 all: iptb
 
-deps:
-	go mod download
-
-iptb: deps
+iptb:
 	(cd iptb; go build)
 CLEAN += iptb/iptb
 
-btfslocal: deps
+btfslocal:
 	(cd localbtfs/plugin; go build -buildmode=plugin -o ../../build/localbtfs.so)
 CLEAN += build/localbtfs.so
 
-install: deps
+install:
 	(cd iptb; go install)
 
 clean:
@@ -49,5 +46,4 @@ start_testnet:
 stop:
 	iptb stop
 
-
-.PHONY: all clean ipfslocal p2pdlocal ipfsdocker ipfsbrowser start start_dev start_testnet stop
+.PHONY: all clean btfslocal iptb start start_dev start_testnet stop
